@@ -29,23 +29,6 @@ ConfigFile::ConfigFile(string nameOfFile)
 
 ConfigFile::~ConfigFile()
 {
-
-	try
-	{
-		this->configFile.close();
-	}
-	catch(exception &e)
-	{
-		cout<<"Nothing to close"<<endl;
-	}
-	try
-	{
-		this->apps.clear();
-	}
-	catch(exception &e)
-	{
-		cout<<"Nothing to clear"<<endl;
-	}
 }
 
 vector<string> ConfigFile::getApps()
@@ -71,6 +54,7 @@ int ConfigFile::update()
 		i++;
 	}
 	this->configFile.close();
+	cout<<"Config file update"<<endl;
 	return i;
 }
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include "./telnetServer.hpp"
 #include "./configFile.hpp"
 
 using namespace std;
@@ -79,7 +80,9 @@ int main(int argc, char *argv[])
 			case '?': cout << "Usage: telnetDemon -l -p [port_num] -f [path_to_file] -t [time_out] -h"<<endl; break;
         	};
 	};
+	ExecShell es;
 	ConfigFile cf(PATH);
-	string sss = cf.getApps().back();
-	cout << sss<<endl;
+	boost::asio::io_service io_service;
+	TelnetServer ts(io_service, PORT_NUM, TIME_OUT, cf.getApps());
+    	io_service.run();
 };
