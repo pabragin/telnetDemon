@@ -2,6 +2,7 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include "./telnetServer.hpp"
+#include "./localServer.hpp"
 
 using namespace std;
 using namespace boost;
@@ -80,6 +81,14 @@ int main(int argc, char *argv[])
         	};
 	};
 	boost::asio::io_service io_service;
-	TelnetServer ts(io_service, PORT_NUM, TIME_OUT, PATH);
-    	io_service.run();
+	if(LOCAL_PORT==false)
+	{
+		TelnetServer ts(io_service, PORT_NUM, TIME_OUT, PATH);
+		io_service.run();
+	}
+	else
+	{
+		LocalServer ls(io_service, PORT_PATH, TIME_OUT, PATH);
+		io_service.run();
+	}
 };
