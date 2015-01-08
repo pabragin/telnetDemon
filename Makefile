@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS= -Wall
+CFLAGS= -Wall -g
 LIBS= -lboost_filesystem -lboost_system -lpthread -lboost_thread
 all: telnetDemon
 telnetDemon: main.cpp configFile.cpp telnetServer.cpp execShell.cpp
-	$(CC) -g -o $@  $^ $(LIBS) $(CFLAGS)
+	$(CC) $(CFLAGS) -o $@  $^ $(LIBS)
 clean: 
 	rm -f telnetDemon
 

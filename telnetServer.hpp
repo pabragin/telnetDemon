@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include "./execShell.hpp"
+#include "./configFile.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -18,9 +19,10 @@ class session
 {
 	public:
   		session(boost::asio::io_service& io_service): socket_(io_service){memset(data_, 0,max_length);};
+		~session(){socket_.close();};
   		tcp::socket& socket();
   		void start();
-		void setParam(unsigned short port, unsigned int time_out, vector<string> allowedCommands);
+		void setParam(unsigned short port, unsigned int time_out);
 	private:
   		void handle_read(const boost::system::error_code& error, size_t bytes_transferred);
   		void handle_write(const boost::system::error_code& error);
@@ -29,21 +31,19 @@ class session
   		char data_[max_length];
 		unsigned short port;
 		unsigned int time_out;
-		vector<string> allowedCommands;
 };
 
 class TelnetServer
 {
 	public:
-  		TelnetServer(boost::asio::io_service& io_service, unsigned short port, unsigned int time_out, vector<string> allowedCommands)
+  		TelnetServer(boost::asio::io_service& io_service, unsigned short port, unsigned int time_out, string PathToConfigFile)
     		: io_service_(io_service),acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
   		{
 			this->port = port;
 			this->time_out = time_out;
-			this->allowedCommands = allowedCommands;
+			ConfigFile::getInstance().open(PathToConfigFile);
     			start_accept();
   		}
-		void setAllowedCommands(vector<string> allowedCommands);
 
 	private:
   		void start_accept();
@@ -52,5 +52,8 @@ class TelnetServer
   		tcp::acceptor acceptor_;
 		unsigned short port;
 		unsigned int time_out;
-		vector<string> allowedCommands;		
+		//ConfigFile &configFile;	
+		//static TelnetServer instance;
+		//void handler_sighup(int sig);
+		//static void static_handler_sighup(int sig);	
 };

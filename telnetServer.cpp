@@ -13,11 +13,10 @@ void session::start()
         boost::asio::placeholders::error));
 }
 
-void session::setParam(unsigned short port, unsigned int time_out, vector<string> allowedCommands)
+void session::setParam(unsigned short port, unsigned int time_out)
 {
 	this->port=port;
 	this->time_out=time_out;
-	this->allowedCommands=allowedCommands;
 }
 
 void session::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
@@ -32,16 +31,20 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
 		ExecShell es;
 		string utilName = es.getNameOfUtility(data_);
 		string resOfEx = "";
-		if (std::find(this->allowedCommands.begin(), this->allowedCommands.end(), utilName) != this->allowedCommands.end())
+		vector<string> buf = ConfigFile::getInstance().getApps();
+		if (std::find(buf.begin(), buf.end(), utilName) != buf.end())
 		{
 			for(int i=0; i<max_length; i++)
 			{
-				if(data_[i]<0x020 || data_[i]>0x7e)
+				if(data_[i]==13 || data_[i]==10)
+				{
 					data_[i]=0;
+					break;
+				}
 			}
 			string str = data_;
-			//if (str.size () > 1)  str.resize (str.size () - 2);
-			resOfEx = es.exec(str)+'#';
+			resOfEx = es.exec(str, this->time_out);
+			resOfEx +='#';
 		}
 		else
 		{
@@ -54,7 +57,8 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
     	}
     	else
     	{
-      		delete this;
+      		socket_.close();
+		return;
     	}
 }
 
@@ -70,14 +74,15 @@ void session::handle_write(const boost::system::error_code& error)
     	}
     	else
     	{
-      		delete this;
+      		socket_.close();
+		return;
     	}
 }
 
 void TelnetServer::start_accept()
 {
 	session* new_session = new session(io_service_);
-	new_session->setParam(this->port, this->time_out, this->allowedCommands);
+	new_session->setParam(this->port, this->time_out);
     	acceptor_.async_accept(new_session->socket(),
         boost::bind(&TelnetServer::handle_accept, this, new_session,
         boost::asio::placeholders::error));
