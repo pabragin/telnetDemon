@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 #include <boost/lexical_cast.hpp>
-#include "./telnetServer.hpp"
-#include "./localServer.hpp"
+#include "../incl/telnetServer.hpp"
+#include "../incl/localServer.hpp"
 
 using namespace std;
 using namespace boost;

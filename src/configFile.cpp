@@ -1,4 +1,4 @@
-#include "./configFile.hpp"
+#include "../incl/configFile.hpp"
 
 vector<string> ConfigFile::getApps()
 {

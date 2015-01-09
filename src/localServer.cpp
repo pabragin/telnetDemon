@@ -1,25 +1,25 @@
-#include "./telnetServer.hpp"
+#include "../incl/localServer.hpp"
 
-tcp::socket& session::socket()
+stream_protocol::socket& lsession::socket()
 {
 	return socket_;
 }
 
-void session::start()
+void lsession::start()
 {
 	string str = "Welcome to " + string(VERSION) + "\n" + "To exit type 'quit'" +"\n#";
 	boost::asio::async_write(socket_,
         boost::asio::buffer(str, str.size()),
-        boost::bind(&session::handle_write, this,
+        boost::bind(&lsession::handle_write, this,
         boost::asio::placeholders::error));
 }
 
-void session::setParam(unsigned int time_out)
+void lsession::setParam(unsigned int time_out)
 {
 	this->time_out=time_out;
 }
 
-void session::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
+void lsession::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
 	if (!error)
     	{
@@ -51,7 +51,7 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
 		} 
       		boost::asio::async_write(socket_,
           	boost::asio::buffer(resOfEx, resOfEx.size()),
-          	boost::bind(&session::handle_write, this,
+          	boost::bind(&lsession::handle_write, this,
             	boost::asio::placeholders::error));
     	}
     	else
@@ -61,13 +61,13 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
     	}
 }
 
-void session::handle_write(const boost::system::error_code& error)
+void lsession::handle_write(const boost::system::error_code& error)
 {
 	if (!error)
     	{
 		memset(data_, 0,max_length);
       		socket_.async_read_some(boost::asio::buffer(data_, max_length),
-          	boost::bind(&session::handle_read, this,
+          	boost::bind(&lsession::handle_read, this,
             	boost::asio::placeholders::error,
             	boost::asio::placeholders::bytes_transferred));
     	}
@@ -78,16 +78,16 @@ void session::handle_write(const boost::system::error_code& error)
     	}
 }
 
-void TelnetServer::start_accept()
+void LocalServer::start_accept()
 {
-	session* new_session = new session(io_service_);
+	lsession* new_session = new lsession(io_service_);
 	new_session->setParam(this->time_out);
-    	acceptor_.async_accept(new_session->socket(),
-        boost::bind(&TelnetServer::handle_accept, this, new_session,
+    	acceptor_->async_accept(new_session->socket(),
+        boost::bind(&LocalServer::handle_accept, this, new_session,
         boost::asio::placeholders::error));
 }
 
-void TelnetServer::handle_accept(session* new_session,const boost::system::error_code& error)
+void LocalServer::handle_accept(lsession* new_session,const boost::system::error_code& error)
 {
 	if (!error)
     	{
