@@ -14,9 +14,8 @@ void session::start()
         boost::asio::placeholders::error));
 }
 
-void session::setParam(unsigned short port, unsigned int time_out)
+void session::setParam(unsigned int time_out)
 {
-	this->port=port;
 	this->time_out=time_out;
 }
 
@@ -29,8 +28,7 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
 			socket_.close();
 			return;
 		}
-		ExecShell es;
-		string utilName = es.getNameOfUtility(data_);
+		string utilName = ExecShell::getNameOfUtility(data_);
 		string resOfEx = "";
 		vector<string> buf = ConfigFile::getInstance().getApps();
 		if (std::find(buf.begin(), buf.end(), utilName) != buf.end())
@@ -44,7 +42,7 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
 				}
 			}
 			string str = data_;
-			resOfEx = es.exec(str, this->time_out);
+			resOfEx = ExecShell::exec(str, this->time_out);
 			resOfEx +='#';
 		}
 		else
@@ -83,7 +81,7 @@ void session::handle_write(const boost::system::error_code& error)
 void TelnetServer::start_accept()
 {
 	session* new_session = new session(io_service_);
-	new_session->setParam(this->port, this->time_out);
+	new_session->setParam(this->time_out);
     	acceptor_.async_accept(new_session->socket(),
         boost::bind(&TelnetServer::handle_accept, this, new_session,
         boost::asio::placeholders::error));

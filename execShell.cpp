@@ -4,7 +4,7 @@ string ExecShell::exec(string cmd, unsigned int time_out)
 {
 	string res = cmd;
 	bool canceled = false;
-	boost::thread t(&ExecShell::executionThread,this, &res, &canceled);
+	boost::thread t(executionThread,&res, &canceled);
 	unsigned int it=0;
 	while(canceled==false && it<time_out)
 	{

@@ -14,9 +14,8 @@ void lsession::start()
         boost::asio::placeholders::error));
 }
 
-void lsession::setParam(string port, unsigned int time_out)
+void lsession::setParam(unsigned int time_out)
 {
-	this->port=port;
 	this->time_out=time_out;
 }
 
@@ -29,8 +28,7 @@ void lsession::handle_read(const boost::system::error_code& error, size_t bytes_
 			socket_.close();
 			return;
 		}
-		ExecShell es;
-		string utilName = es.getNameOfUtility(data_);
+		string utilName = ExecShell::getNameOfUtility(data_);
 		string resOfEx = "";
 		vector<string> buf = ConfigFile::getInstance().getApps();
 		if (std::find(buf.begin(), buf.end(), utilName) != buf.end())
@@ -44,7 +42,7 @@ void lsession::handle_read(const boost::system::error_code& error, size_t bytes_
 				}
 			}
 			string str = data_;
-			resOfEx = es.exec(str, this->time_out);
+			resOfEx = ExecShell::exec(str, this->time_out);
 			resOfEx +='#';
 		}
 		else
@@ -83,8 +81,8 @@ void lsession::handle_write(const boost::system::error_code& error)
 void LocalServer::start_accept()
 {
 	lsession* new_session = new lsession(io_service_);
-	new_session->setParam(this->localPort, this->time_out);
-    	acceptor_.async_accept(new_session->socket(),
+	new_session->setParam(this->time_out);
+    	acceptor_->async_accept(new_session->socket(),
         boost::bind(&LocalServer::handle_accept, this, new_session,
         boost::asio::placeholders::error));
 }

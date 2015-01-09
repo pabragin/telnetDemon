@@ -91,4 +91,5 @@ int main(int argc, char *argv[])
 		LocalServer ls(io_service, PORT_PATH, TIME_OUT, PATH);
 		io_service.run();
 	}
+	return 0;
 };
