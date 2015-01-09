@@ -27,7 +27,7 @@ void session::handle_read(const boost::system::error_code& error, size_t bytes_t
 		{
 			socket_.close();
 			return;
-		}git
+		}
 		string utilName = ExecShell::getNameOfUtility(data_);
 		string resOfEx = "";
 		vector<string> buf = ConfigFile::getInstance().getApps();
