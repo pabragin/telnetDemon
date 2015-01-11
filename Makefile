@@ -8,6 +8,10 @@ ifeq ($(UNAME), FreeBSD)
 	LIBS += -L /usr/local/lib
 	INCLUDE += -I /usr/local/include
 endif
+ifeq ($(UNAME), SunOS)
+	CC=g++
+	LIBS+= -lsocket -pthreads -L /usr/local/lib
+endif
 telnetDemon: $(SOURCE)
 	$(CC) $(CFLAGS) -o $@ $^  $(LIBS) $(INCLUDE) 
 clean: 
